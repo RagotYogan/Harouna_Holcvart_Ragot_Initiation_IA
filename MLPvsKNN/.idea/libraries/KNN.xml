@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="KNN">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/KNN.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
