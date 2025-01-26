@@ -4,7 +4,7 @@ public class PerceptronTester {
 
     public static void main(String[] args) {
         int passageMax = 10000;
-        double learningRate = 0.6;
+        double learningRate = 0.1;
         double errorThreshold = 0.01;
 
         double[][] inputs = {
@@ -26,8 +26,8 @@ public class PerceptronTester {
         double[][] orOutputs2 = {{0,0}, {1,1}, {1,1}, {1,1}};
         double[][] xorOutputs2 = {{0,0}, {1,1}, {1,1}, {0,0}};
 
-        int[] layers = {2, 3, 1};
-        int[] layers2 = {2, 3, 2};
+        int[] layers = {2, 2, 1};
+        int[] layers2 = {2, 2, 2};
         System.out.println("Test avec " + functionName + " function" + " sortie dimension 1 \n");
 
         MLP mlp = new MLP(layers, learningRate, transferFunction);
@@ -79,7 +79,7 @@ public class PerceptronTester {
 
         } while (erreur > errorThreshold && passages < passageMax);
 
-        System.out.printf("Entrainement finie pour %s en %d passages, Erreur finale: %.6f%n", tableName, passages, erreur / inputs.length);
+        System.out.printf("Entrainement finie pour %s en %d passages, Erreur finale: %.6f%n", tableName, passages, erreur / inputs.length );
 
         System.out.println("Test resultat:");
         for (int i = 0; i < inputs.length; i++) {
@@ -92,7 +92,7 @@ public class PerceptronTester {
     public static String formatArray(double[] array) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < array.length; i++) {
-            sb.append(String.format("%.2f", array[i]));
+            sb.append(String.format("%.6f", array[i]));
             if (i < array.length - 1) sb.append(", ");
         }
         sb.append("]");
