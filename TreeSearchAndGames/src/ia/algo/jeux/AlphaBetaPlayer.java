@@ -61,7 +61,7 @@ public class AlphaBetaPlayer extends Player {
         if (game.endOfGame(s) || profondeur >= profondeurMax){
             return new ActionValuePair(null, s.getGameValue());
         }
-        double vMin = Double.MAX_VALUE;
+        double vMin = Double.POSITIVE_INFINITY;
         Action cMin = null;
         GameState sprime;
         for(Action c : game.getActions(s)){
