@@ -49,6 +49,10 @@ public class PerceptronTester {
     public static void testLogicTable(String tableName, MLP mlp, double[][] inputs, double[][] outputs, int passageMax, double errorThreshold) {
         System.out.println("Entrainement pour " + tableName + " table\n");
 
+        // Créer des copies profondes des entrées et sorties
+        double[][] shuffledInputs = deepCopy(inputs);
+        double[][] shuffledOutputs = deepCopy(outputs);
+
         Random random = new Random();
         int passages = 0;
         double erreur;
@@ -56,30 +60,34 @@ public class PerceptronTester {
         do {
             erreur = 0.0;
 
-            for (int i = 0; i < inputs.length; i++) {
-                int swapIndex = random.nextInt(inputs.length);
-                double[] tempInput = inputs[i];
-                inputs[i] = inputs[swapIndex];
-                inputs[swapIndex] = tempInput;
+            // Mélanger les données de manière synchronisée
+            for (int i = 0; i < shuffledInputs.length; i++) {
+                int swapIndex = random.nextInt(shuffledInputs.length);
+                // Échanger les entrées
+                double[] tempInput = shuffledInputs[i];
+                shuffledInputs[i] = shuffledInputs[swapIndex];
+                shuffledInputs[swapIndex] = tempInput;
 
-                double[] tempOutput = outputs[i];
-                outputs[i] = outputs[swapIndex];
-                outputs[swapIndex] = tempOutput;
+                // Échanger les sorties correspondantes
+                double[] tempOutput = shuffledOutputs[i];
+                shuffledOutputs[i] = shuffledOutputs[swapIndex];
+                shuffledOutputs[swapIndex] = tempOutput;
             }
 
-            for (int i = 0; i < inputs.length; i++) {
-                erreur += mlp.backPropagate(inputs[i], outputs[i]);
+            // Entraîner le MLP avec les données mélangées
+            for (int i = 0; i < shuffledInputs.length; i++) {
+                erreur += mlp.backPropagate(shuffledInputs[i], shuffledOutputs[i]);
             }
 
             passages++;
 
             if (passages % 1000 == 0) {
-                System.out.printf("Passage %d, Erreur: %.6f%n", passages, erreur / inputs.length);
+                System.out.printf("Passage %d, Erreur: %.6f%n", passages, erreur / shuffledInputs.length);
             }
 
         } while (erreur > errorThreshold && passages < passageMax);
 
-        System.out.printf("Entrainement finie pour %s en %d passages, Erreur finale: %.6f%n", tableName, passages, erreur / inputs.length );
+        System.out.printf("Entrainement finie pour %s en %d passages, Erreur finale: %.6f%n", tableName, passages, erreur / shuffledInputs.length );
 
         System.out.println("Test resultat:");
         for (int i = 0; i < inputs.length; i++) {
@@ -87,6 +95,18 @@ public class PerceptronTester {
             System.out.printf("Entrée: %s, Attendu: %s, Prédit: %s%n", formatArray(inputs[i]), formatArray(outputs[i]), formatArray(result));
         }
         System.out.println();
+    }
+
+    public static double[][] deepCopy(double[][] original) {
+        if (original == null) {
+            return null;
+        }
+
+        final double[][] result = new double[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            result[i] = original[i].clone();
+        }
+        return result;
     }
 
     public static String formatArray(double[] array) {
