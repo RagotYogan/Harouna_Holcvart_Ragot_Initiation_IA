@@ -9,59 +9,65 @@ import ia.framework.jeux.Player;
 
 
 public class MinMaxPlayer extends Player {
+    private int profondeurMax;
+    private int profondeur;
 
-    public MinMaxPlayer(Game g, boolean p1,int depth) {
+    public MinMaxPlayer(Game g, boolean p1,int valueOfParam) {
         super(g, p1);
+        name = "minmax";
+        profondeurMax = valueOfParam;
     }
 
     @Override
     public Action getMove(GameState state) {
-        ActionValuePair val;
-        if (this.player == PLAYER1) {
-            val = maxValue(state);
+        ActionValuePair actionValuePair;
+        profondeur = 0;
+        if (player==PLAYER1){
+            actionValuePair = maxValue(state);
         } else {
-            val = minValue(state);
+            actionValuePair = minValue(state);
         }
-        return val.getAction();
+        return actionValuePair.getAction();
     }
 
-    private ActionValuePair maxValue(GameState state) {
-        if (game.endOfGame(state)) {
-            return new ActionValuePair(null, state.getGameValue());
+    private ActionValuePair maxValue(GameState s){
+        this.incStateCounter();
+        if (game.endOfGame(s) || profondeur >= profondeurMax){
+            return new ActionValuePair(null, s.getGameValue());
         }
-        double v_max = Double.NEGATIVE_INFINITY;
-        Action c_max = null;
-
-        for (Action c : game.getActions(state)) {
-            GameState s_suivant = (GameState) game.doAction(state, c);
-            double v = minValue(s_suivant).getValue();
-            if (v >= v_max) {
-                v_max = v;
-                c_max = c;
+        double vMax = Double.NEGATIVE_INFINITY;
+        Action aMax = null;
+        GameState sprime;
+        for(Action a : game.getActions(s)){
+            sprime = (GameState) game.doAction(s, a);
+            profondeur ++;
+            ActionValuePair vAprime = minValue(sprime);
+            if(vAprime.getValue() >= vMax){
+                vMax = vAprime.getValue();
+                aMax = a;
             }
         }
-        return new ActionValuePair(c_max, v_max);
+        return new ActionValuePair(aMax, vMax);
     }
 
-
-
-    private ActionValuePair minValue(GameState state) {
-        if (game.endOfGame(state)) {
-            return new ActionValuePair(null, state.getGameValue());
+    private ActionValuePair minValue(GameState s){
+        this.incStateCounter();
+        if (game.endOfGame(s) || profondeur >= profondeurMax){
+            return new ActionValuePair(null, s.getGameValue());
         }
-        double v_min = Double.POSITIVE_INFINITY;
-        Action c_min = null;
-
-        for (Action c : game.getActions(state)) {
-            GameState s_suivant = (GameState) game.doAction(state, c);
-            double v = maxValue(s_suivant).getValue();
-            if (v <= v_min) {
-                v_min = v;
-                c_min = c;
+        double vMin =  Double.POSITIVE_INFINITY;
+        Action aMin = null;
+        GameState sprime;
+        for(Action a : game.getActions(s)){
+            sprime = (GameState) game.doAction(s, a);
+            profondeur ++;
+            ActionValuePair vAprime = maxValue(sprime);
+            if(vAprime.getValue() <= vMin){
+                vMin = vAprime.getValue();
+                aMin = a;
             }
         }
-        return new ActionValuePair(c_min, v_min);
+        return new ActionValuePair(aMin, vMin);
     }
-
 }
 

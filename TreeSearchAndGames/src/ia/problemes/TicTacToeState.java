@@ -52,8 +52,8 @@ public class TicTacToeState extends MnkGameState {
 
         double value = pos_x-pos_o;
 
-        // System.out.println("Possibilities: X = "+pos_x+", O = "+pos_o+
-        //". Value = "+value);
+        //System.out.println("Possibilities: X = "+pos_x+", O = "+pos_o+
+       // ". Value = "+value);
         return value;
     }
     

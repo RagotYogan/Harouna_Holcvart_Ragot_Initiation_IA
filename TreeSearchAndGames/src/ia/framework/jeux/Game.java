@@ -3,6 +3,7 @@ package ia.framework.jeux;
 import java.util.ArrayList;
 import java.util.Random;
 
+import ia.framework.common.ActionValuePair;
 import ia.framework.common.BaseProblem;
 import ia.framework.common.Action;
 import ia.framework.common.State;
@@ -59,7 +60,4 @@ public abstract class Game extends BaseProblem {
             return possible.get(rng.nextInt(possible.size()));
         return null; 
     }
-
-   
-    
 }

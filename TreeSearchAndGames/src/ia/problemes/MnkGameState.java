@@ -48,7 +48,216 @@ public class MnkGameState extends AbstractMnkGameState {
      * @return la valeur du jeux
      **/
     protected double evaluationFunction() {
-        return Double.NaN;
+        //int pos_x = this.possibleLines(X);
+        //int pos_o = this.possibleLines(O);
+        double pos_x = this.calculateDanger(X);
+        double pos_o = this.calculateDanger(O);
+
+        double value = pos_x - pos_o;
+
+        //System.out.println("Possibilities: X = " + pos_x + ", O = " + pos_o + ". Value = " + value);
+        return value;
+    }
+
+// API privée
+
+    // Compte le nombre de lignes possibles pour un joueur donné
+    private int possibleLines(int player) {
+        return this.possibleVerticalLines(player) +
+                this.possibleHorizontalLines(player) +
+                this.possibleDiagonalLines(player);
+    }
+
+    // Compte le nombre de lignes verticales possibles pour un joueur donné
+    private int possibleVerticalLines(int player) {
+        int res = 0;
+        for (int c = 0; c < this.cols; c++) {
+            for (int r = 0; r <= this.rows - this.streak; r++) {
+                int counter = 0;
+                for (int k = 0; k < this.streak; k++) {
+                    if (this.getValueAt(r + k, c) == this.otherPlayer(player)) {
+                        counter = 0;
+                        break;
+                    } else if (this.getValueAt(r + k, c) == player) {
+                        counter++;
+                    } else {
+                        counter++; // Vide
+                    }
+                }
+                if (counter > 0) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+
+    // Compte le nombre de lignes horizontales possibles pour un joueur donné
+    private int possibleHorizontalLines(int player) {
+        int res = 0;
+        for (int r = 0; r < this.rows; r++) {
+            for (int c = 0; c <= this.cols - this.streak; c++) {
+                int counter = 0;
+                for (int k = 0; k < this.streak; k++) {
+                    if (this.getValueAt(r, c + k) == this.otherPlayer(player)) {
+                        counter = 0;
+                        break;
+                    } else if (this.getValueAt(r, c + k) == player) {
+                        counter++;
+                    } else {
+                        counter++; // Vide
+                    }
+                }
+                if (counter > 0) {
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+
+    // Compte le nombre de lignes diagonales possibles pour un joueur donné
+    private int possibleDiagonalLines(int player) {
+        int res = 0;
+
+        for (int c = 0; c <= this.cols - this.streak; c++) {
+            for (int r = 0; r <= this.rows - this.streak; r++) {
+                int counter = 0;
+                for (int k = 0; k < this.streak; k++) {
+                    if (this.getValueAt(r + k, c + k) == this.otherPlayer(player)) {
+                        counter = 0;
+                        break;
+                    } else if (this.getValueAt(r + k, c + k) == player) {
+                        counter++;
+                    } else {
+                        counter++;
+                    }
+                }
+                if (counter > 0) {
+                    res++;
+                }
+            }
+        }
+
+        for (int c = 0; c <= this.cols - this.streak; c++) {
+            for (int r = this.streak - 1; r < this.rows; r++) {
+                int counter = 0;
+                for (int k = 0; k < this.streak; k++) {
+                    if (this.getValueAt(r - k, c + k) == this.otherPlayer(player)) {
+                        counter = 0;
+                        break;
+                    } else if (this.getValueAt(r - k, c + k) == player) {
+                        counter++;
+                    } else {
+                        counter++; // Vide
+                    }
+                }
+                if (counter > 0) {
+                    res++;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    private double calculateDanger(int player) {
+        double danger = 0.0;
+        int opponent = this.otherPlayer(player);
+
+        // Parcourir toutes les lignes verticales possibles
+        for (int c = 0; c < this.cols; c++) {
+            for (int r = 0; r <= this.rows - this.streak; r++) {
+                boolean blocked = false;
+                int freeCells = 0;
+
+                for (int k = 0; k < this.streak; k++) {
+                    int cell = this.getValueAt(r + k, c);
+                    if (cell == opponent) {
+                        blocked = true;
+                        break;
+                    }
+                    if (cell == EMPTY) {
+                        freeCells++;
+                    }
+                }
+
+                if (!blocked && freeCells > 0) {
+                    danger += 1.0 / Math.pow(2, freeCells);
+                }
+            }
+        }
+
+        // Parcourir toutes les lignes horizontales possibles
+        for (int r = 0; r < this.rows; r++) {
+            for (int c = 0; c <= this.cols - this.streak; c++) {
+                boolean blocked = false;
+                int freeCells = 0;
+
+                for (int k = 0; k < this.streak; k++) {
+                    int cell = this.getValueAt(r, c + k);
+                    if (cell == opponent) {
+                        blocked = true;
+                        break;
+                    }
+                    if (cell == EMPTY) {
+                        freeCells++;
+                    }
+                }
+
+                if (!blocked && freeCells > 0) {
+                    danger += 1.0 / Math.pow(2, freeCells);
+                }
+            }
+        }
+
+        // Parcourir toutes les diagonales 45°
+        for (int c = 0; c <= this.cols - this.streak; c++) {
+            for (int r = 0; r <= this.rows - this.streak; r++) {
+                boolean blocked = false;
+                int freeCells = 0;
+
+                for (int k = 0; k < this.streak; k++) {
+                    int cell = this.getValueAt(r + k, c + k);
+                    if (cell == opponent) {
+                        blocked = true;
+                        break;
+                    }
+                    if (cell == EMPTY) {
+                        freeCells++;
+                    }
+                }
+
+                if (!blocked && freeCells > 0) {
+                    danger += 1.0 / Math.pow(2, freeCells);
+                }
+            }
+        }
+
+        // Parcourir toutes les diagonales -45°
+        for (int c = 0; c <= this.cols - this.streak; c++) {
+            for (int r = this.streak - 1; r < this.rows; r++) {
+                boolean blocked = false;
+                int freeCells = 0;
+
+                for (int k = 0; k < this.streak; k++) {
+                    int cell = this.getValueAt(r - k, c + k);
+                    if (cell == opponent) {
+                        blocked = true;
+                        break;
+                    }
+                    if (cell == EMPTY) {
+                        freeCells++;
+                    }
+                }
+
+                if (!blocked && freeCells > 0) {
+                    danger += 1.0 / Math.pow(2, freeCells);
+                }
+            }
+        }
+
+        return danger;
     }
     
 
