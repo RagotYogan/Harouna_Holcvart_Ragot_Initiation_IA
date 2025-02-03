@@ -17,15 +17,14 @@ public class AStar extends TreeSearch {
 
     @Override
     public boolean solve() {
-        // Initialiser la frontière comme une liste
+
         frontier = new LinkedList<>();
         frontier.add(SearchNode.makeRootSearchNode(initial_state));
 
-        // Ensemble des états explorés
         explored = new HashSet<>();
 
         while (!frontier.isEmpty()) {
-            // Trouver et retirer le nœud avec le coût total f(n) le plus bas
+
             SearchNode bestNode = null;
             for (SearchNode node : frontier) {
                 double nodeCost = node.getCost() + node.getHeuristic();
@@ -38,21 +37,19 @@ public class AStar extends TreeSearch {
 
             State currentState = bestNode.getState();
 
-            // Vérifier si on a atteint l'état but
+
             if (problem.isGoalState(currentState)) {
                 end_node = bestNode;
                 return true;
             }
 
-            // Ajouter l'état courant à l'ensemble des explorés
             explored.add(currentState);
 
-            // Générer les enfants du nœud courant
             for (Action action : problem.getActions(currentState)) {
                 SearchNode child = SearchNode.makeChildSearchNode(problem, bestNode, action);
                 State childState = child.getState();
 
-                // Vérifier si l'état enfant est déjà exploré ou dans la frontière
+
                 boolean inFrontier = false;
                 SearchNode existingNode = null;
 
@@ -75,6 +72,6 @@ public class AStar extends TreeSearch {
             }
         }
 
-        return false; // Aucun chemin trouvé
+        return false;
     }
 }
